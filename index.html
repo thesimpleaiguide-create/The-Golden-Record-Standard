@@ -1,0 +1,424 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Section 2.1: The Golden Record Standard</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Montserrat:wght@600;700;800&display=swap');
+
+        :root {
+            --ttn-navy: #0C2340;
+            --ttn-trust-blue: #005EB8;
+            --ttn-sky-cyan: #59CBE8;
+            --ttn-action-orange: #FE5000;
+            --ttn-slate: #333F48;
+            --ttn-ice-blue: #DBE2E9;
+            --ttn-success: #00BF6F;
+            --ttn-error: #D5281B;
+            --font-main: 'Inter', sans-serif;
+            --font-heading: 'Montserrat', sans-serif;
+            --radius-soft: 8px;
+            --radius-card: 14px;
+            --shadow-main: 0px 4px 14px rgba(12, 35, 64, 0.05);
+            --shadow-hover: 0px 6px 18px rgba(12, 35, 64, 0.08);
+        }
+
+        *, *::before, *::after {
+            box-sizing: border-box;
+        }
+
+        body, html {
+            font-family: var(--font-main);
+            color: var(--ttn-slate);
+            background-color: transparent;
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+        }
+
+        h1, h2, h3, h4, .font-heading {
+            font-family: var(--font-heading);
+        }
+
+        .main-container {
+            width: 100%;
+            height: 100%;
+            background-color: #FFFFFFEE;
+            border-radius: 1rem;
+            border: 1px solid #DBE2E9;
+            box-shadow: inset 0 2px 4px rgba(0,0,0,0.02);
+            position: relative;
+            background-image: url('Watermark_Background.jpeg');
+            background-position: center;
+            background-size: cover;
+            background-repeat: no-repeat;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+
+        .grid-card {
+            background-color: #FFFFFF;
+            border: 1.5px solid var(--ttn-ice-blue);
+            border-top: 5px solid var(--ttn-trust-blue);
+            border-radius: var(--radius-card);
+            box-shadow: var(--shadow-main);
+            transition: all 180ms ease-in-out;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        .grid-card:hover {
+            box-shadow: var(--shadow-hover);
+            transform: translateY(-2px);
+        }
+
+        .grid-card.highlight {
+            border-top-color: var(--ttn-action-orange);
+        }
+
+        .card-img {
+            width: 100%;
+            height: 175px;
+            object-fit: cover;
+            border-bottom: 1px solid var(--ttn-ice-blue);
+            background-color: #F1F5F9;
+        }
+
+        /* Info Badge with Circle */
+        .info-circle-btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 20px;
+            height: 20px;
+            border-radius: 9999px;
+            background-color: #FFE5D9;
+            color: var(--ttn-action-orange);
+            font-family: var(--font-heading);
+            font-weight: 800;
+            font-size: 11px;
+            border: 1.5px solid #FE5000;
+            cursor: pointer;
+            transition: all 150ms ease-in-out;
+            box-shadow: 0 1px 3px rgba(254, 80, 0, 0.2);
+            line-height: 1;
+        }
+
+        .info-circle-btn:hover {
+            background-color: var(--ttn-action-orange);
+            color: #FFFFFF;
+            transform: scale(1.1);
+        }
+
+        /* Modal Overlay */
+        .modal-overlay {
+            position: fixed;
+            inset: 0;
+            background-color: rgba(12, 35, 64, 0.65);
+            backdrop-filter: blur(4px);
+            z-index: 50;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 1rem;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 200ms ease-in-out;
+        }
+
+        .modal-overlay.active {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        .modal-content {
+            background-color: #FFFFFF;
+            border-radius: var(--radius-card);
+            border: 1.5px solid var(--ttn-ice-blue);
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.2), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+            max-width: 650px;
+            width: 100%;
+            max-height: 90vh;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            transform: scale(0.95);
+            transition: transform 200ms ease-in-out;
+        }
+
+        .modal-overlay.active .modal-content {
+            transform: scale(1);
+        }
+
+        .toggle-switch {
+            width: 34px;
+            height: 18px;
+            background-color: var(--ttn-ice-blue);
+            border-radius: 9999px;
+            position: relative;
+            cursor: pointer;
+            transition: background-color 180ms ease-in-out;
+        }
+        .toggle-switch.active {
+            background-color: var(--ttn-success);
+        }
+        .toggle-switch::after {
+            content: '';
+            position: absolute;
+            top: 2px;
+            left: 2px;
+            width: 14px;
+            height: 14px;
+            background-color: #FFFFFF;
+            border-radius: 50%;
+            transition: transform 180ms ease-in-out;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.2);
+        }
+        .toggle-switch.active::after {
+            transform: translateX(16px);
+        }
+    </style>
+</head>
+<body class="p-2 sm:p-3 flex items-center justify-center box-border">
+
+    <div id="rootContainer" class="main-container p-4 sm:p-5">
+        
+        <!-- Header Utility -->
+        <div class="flex items-center justify-between mb-3.5 w-full relative z-20">
+            <span class="inline-flex items-center space-x-1.5 text-xs sm:text-sm font-bold text-[#005EB8] bg-[#DBE2E9] px-3.5 py-1.5 rounded-[4px] font-heading uppercase tracking-wider">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
+                <span>Clinical Record &bull; The Golden Standard</span>
+            </span>
+
+            <button id="audioToggleBtn" type="button" class="flex items-center space-x-2 cursor-pointer bg-white px-3.5 py-1.5 rounded-full border border-[#DBE2E9] shadow-sm hover:border-slate-300 transition-all focus:outline-none">
+                <svg id="speakerIcon" class="w-4 h-4 text-[#005EB8]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.536 8.464a5 5 0 010 7.072m2.828-9.9a9 9 0 010 12.728M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z"></path></svg>
+                <span class="text-xs sm:text-sm font-semibold text-[#0C2340] font-heading">Dr. Lindsay Guidance</span>
+                <div id="audioSwitch" class="toggle-switch"></div>
+            </button>
+        </div>
+
+        <!-- 3-Column Full Frame Grid -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-3.5 sm:gap-4 relative z-20 flex-1">
+            
+            <!-- Card 1: The 5 Golden Record Fields -->
+            <div class="grid-card">
+                <img src="golden_record_entry.jpeg" alt="Golden Record Entry" class="card-img">
+                <div class="p-4 sm:p-4.5 flex flex-col flex-1 justify-between">
+                    <div>
+                        <div class="flex items-center space-x-2 mb-2.5">
+                            <span class="w-6 h-6 rounded-full bg-[#DBE2E9] text-[#005EB8] font-heading font-bold text-xs flex items-center justify-center shrink-0">01</span>
+                            <h3 class="font-bold text-[#0C2340] text-sm sm:text-base font-heading leading-tight">5 Mandatory Fields</h3>
+                        </div>
+                        <div class="text-xs sm:text-sm text-[#333F48] leading-relaxed space-y-2">
+                            <p><strong>Core Elements:</strong> 1. Clinical indication; 2. Offer timing; 3. Patient decision; 4. Chaperone full name & role; 5. Procedural outcome & concerns.</p>
+                            <p><strong>Contemporaneous Standard:</strong> Record every detail during or immediately after the consultation to ensure full legal defensibility.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Card 2: SNOMED CT Software Gap (With Info ! Button) -->
+            <div class="grid-card highlight">
+                <img src="snomed_coding_screen.jpeg" alt="SNOMED Coding Interface" class="card-img">
+                <div class="p-4 sm:p-4.5 flex flex-col flex-1 justify-between">
+                    <div>
+                        <div class="flex items-center justify-between mb-2.5">
+                            <div class="flex items-center space-x-2">
+                                <span class="w-6 h-6 rounded-full bg-[#FFE5D9] text-[#FE5000] font-heading font-bold text-xs flex items-center justify-center shrink-0">02</span>
+                                <h3 class="font-bold text-[#0C2340] text-sm sm:text-base font-heading leading-tight">SNOMED CT &amp; Free Text</h3>
+                            </div>
+                            <button onclick="openSnomedModal(event)" type="button" title="What is SNOMED CT?" class="info-circle-btn">!</button>
+                        </div>
+                        <div class="text-xs sm:text-sm text-[#333F48] leading-relaxed space-y-2">
+                            <p><strong>Software Limitation:</strong> SNOMED codes (Agreed: <code>1104081000000107</code>, Refused: <code>763380007</code>) only log the outcome, not the offer itself.</p>
+                            <p><strong>Mandatory Action:</strong> Clinicians must type free text explicitly stating the offer was made to provide verifiable legal evidence.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Card 3: Documenting Refusals & Pathways -->
+            <div class="grid-card">
+                <img src="refusal_documentation.jpeg" alt="EHR Refusal Documentation" class="card-img">
+                <div class="p-4 sm:p-4.5 flex flex-col flex-1 justify-between">
+                    <div>
+                        <div class="flex items-center space-x-2 mb-2.5">
+                            <span class="w-6 h-6 rounded-full bg-[#DBE2E9] text-[#005EB8] font-heading font-bold text-xs flex items-center justify-center shrink-0">03</span>
+                            <h3 class="font-bold text-[#0C2340] text-sm sm:text-base font-heading leading-tight">Refusals &amp; Safety Limits</h3>
+                        </div>
+                        <div class="text-xs sm:text-sm text-[#333F48] leading-relaxed space-y-2">
+                            <p><strong>Patient Refusal:</strong> State clearly that the chaperone offer was made and declined by the patient under their informed autonomy.</p>
+                            <p><strong>Clinician Boundaries:</strong> If declining unaccompanied practice for safety reasons, document the offered alternatives (rescheduling or same-sex clinician).</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+    </div>
+
+    <!-- SNOMED CT Informational Modal -->
+    <div id="snomedModal" class="modal-overlay" onclick="closeSnomedModal(event)">
+        <div class="modal-content" onclick="event.stopPropagation()">
+            
+            <!-- Modal Header -->
+            <div class="p-4 sm:p-5 border-b border-slate-200 flex items-center justify-between bg-slate-50">
+                <div class="flex items-center space-x-2.5">
+                    <span class="w-7 h-7 rounded-full bg-[#FFE5D9] text-[#FE5000] font-heading font-bold text-sm flex items-center justify-center shrink-0 border border-[#FE5000]">!</span>
+                    <div>
+                        <h2 class="font-heading font-bold text-[#0C2340] text-base sm:text-lg leading-tight">Understanding SNOMED CT</h2>
+                        <p class="text-[11px] text-slate-500 font-medium">The universal healthcare terminology system</p>
+                    </div>
+                </div>
+                <button onclick="closeSnomedModal(event)" type="button" class="w-8 h-8 rounded-full hover:bg-slate-200 text-slate-500 hover:text-[#0C2340] flex items-center justify-center text-lg font-bold transition-colors focus:outline-none">✕</button>
+            </div>
+
+            <!-- Modal Body (Scrollable if needed) -->
+            <div class="p-4 sm:p-5 overflow-y-auto space-y-4 text-xs sm:text-sm text-[#333F48] leading-relaxed">
+                
+                <!-- Definition Box -->
+                <div class="bg-[#F0F7FF] p-3.5 rounded-xl border border-[#BFDBFE]">
+                    <p class="font-medium text-[#005EB8]">
+                        <strong>SNOMED CT</strong> is the universal digital dictionary that translates everyday clinical language into a standardised code the computer can understand.
+                    </p>
+                </div>
+
+                <!-- The Core Concept: Human Words in Front, Digital Barcodes Behind -->
+                <div>
+                    <h3 class="font-heading font-bold text-[#0C2340] text-sm mb-2 text-[#005EB8] uppercase tracking-wider">The Core Concept: Human Words in Front, Digital Barcodes Behind</h3>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+                        
+                        <div class="bg-slate-50 p-3 rounded-lg border border-slate-200">
+                            <h4 class="font-bold text-[#0C2340] mb-1 flex items-center space-x-1.5">
+                                <span class="w-2 h-2 rounded-full bg-[#005EB8]"></span>
+                                <span>The Clinician's Role</span>
+                            </h4>
+                            <p class="text-slate-600 text-xs">
+                                Clinicians speak, type, and read standard medical English (e.g. searching terms like <em>"heart attack"</em>, <em>"MI"</em>, or <em>"myocardial infarction"</em>). They never have to memorise or manually look up numeric codes.
+                            </p>
+                        </div>
+
+                        <div class="bg-slate-50 p-3 rounded-lg border border-slate-200">
+                            <h4 class="font-bold text-[#0C2340] mb-1 flex items-center space-x-1.5">
+                                <span class="w-2 h-2 rounded-full bg-[#FE5000]"></span>
+                                <span>The Computer's Role</span>
+                            </h4>
+                            <p class="text-slate-600 text-xs">
+                                The Electronic Health Record (EHR) matches the chosen term to a unique numerical identifier (e.g. <code>22298006</code>), automatically attaching this digital "barcode" to the patient's record in the background.
+                            </p>
+                        </div>
+
+                    </div>
+                </div>
+
+                <!-- Why It Matters -->
+                <div>
+                    <h3 class="font-heading font-bold text-[#0C2340] text-sm mb-2 text-[#005EB8] uppercase tracking-wider">Why It Matters</h3>
+                    <ul class="space-y-2 text-xs sm:text-sm">
+                        <li class="flex items-start space-x-2">
+                            <span class="text-[#00BF6F] font-bold mt-0.5">✓</span>
+                            <span><strong>Captures Synonyms:</strong> Whether a GP types <em>"high blood pressure"</em> or a hospital doctor types <em>"essential hypertension"</em>, the system recognises both mean the exact same clinical entity.</span>
+                        </li>
+                        <li class="flex items-start space-x-2">
+                            <span class="text-[#00BF6F] font-bold mt-0.5">✓</span>
+                            <span><strong>Eliminates Ambiguity:</strong> A single code ensures that records transferred between GP surgeries, hospitals, and community clinics retain their precise meaning without mistranslation.</span>
+                        </li>
+                        <li class="flex items-start space-x-2">
+                            <span class="text-[#00BF6F] font-bold mt-0.5">✓</span>
+                            <span><strong>Powers Clinical Safety:</strong> Because the system understands the exact medical concept, it can automatically trigger safety alerts (such as allergy warnings or drug contraindications) and support audit reporting.</span>
+                        </li>
+                    </ul>
+                </div>
+
+            </div>
+
+            <!-- Modal Footer -->
+            <div class="p-3 sm:p-4 border-t border-slate-200 bg-slate-50 flex justify-end">
+                <button onclick="closeSnomedModal(event)" type="button" class="px-4 py-1.5 bg-[#005EB8] hover:bg-[#004A91] text-white text-xs sm:text-sm font-heading font-bold rounded-lg transition-colors focus:outline-none shadow-sm">
+                    Close Explanation
+                </button>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- Hidden Audio Elements -->
+    <audio id="audioPart1" src="L3_Sec4_GoldenRecord_Part1.wav" preload="auto"></audio>
+    <audio id="audioPart2" src="L3_Sec4_GoldenRecord_Part2.wav" preload="auto"></audio>
+
+    <script>
+        function openSnomedModal(event) {
+            if (event) event.stopPropagation();
+            document.getElementById('snomedModal').classList.add('active');
+        }
+
+        function closeSnomedModal(event) {
+            if (event) event.stopPropagation();
+            document.getElementById('snomedModal').classList.remove('active');
+        }
+
+        // Close on Escape key
+        window.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') closeSnomedModal();
+        });
+
+        const audioToggleBtn = document.getElementById('audioToggleBtn');
+        const audioSwitch = document.getElementById('audioSwitch');
+        const speakerIcon = document.getElementById('speakerIcon');
+
+        const tracks = [
+            document.getElementById('audioPart1'),
+            document.getElementById('audioPart2')
+        ];
+
+        let currentTrackIdx = 0;
+        let isAudioPlaying = false;
+
+        function playTrack(idx) {
+            if (idx >= tracks.length) {
+                stopAllAudio();
+                return;
+            }
+            currentTrackIdx = idx;
+            const currentAudio = tracks[currentTrackIdx];
+            currentAudio.currentTime = 0;
+            currentAudio.play().then(() => {
+                isAudioPlaying = true;
+                audioSwitch.classList.add('active');
+                speakerIcon.classList.add('text-[#00BF6F]');
+                speakerIcon.classList.remove('text-[#005EB8]');
+            }).catch(err => {
+                stopAllAudio();
+            });
+        }
+
+        tracks.forEach((track, idx) => {
+            track.addEventListener('ended', () => playTrack(idx + 1));
+        });
+
+        function stopAllAudio() {
+            tracks.forEach(track => {
+                track.pause();
+                track.currentTime = 0;
+            });
+            currentTrackIdx = 0;
+            isAudioPlaying = false;
+            audioSwitch.classList.remove('active');
+            speakerIcon.classList.remove('text-[#00BF6F]');
+            speakerIcon.classList.add('text-[#005EB8]');
+        }
+
+        audioToggleBtn.addEventListener('click', (e) => {
+            e.preventDefault();
+            isAudioPlaying ? stopAllAudio() : playTrack(0);
+        });
+    </script>
+</body>
+</html>
